@@ -1,18 +1,23 @@
 from parseInput import *
 from Day4a import *
 
-
-def checkRangeInclusion(largerRangeTasks,smallerRangeTasks):
-    
-    if smallerRangeTasks[0] <= largerRangeTasks[1] and smallerRangeTasks[0] >= largerRangeTasks[0]:
-        result = 1
-    elif smallerRangeTasks[1] <= largerRangeTasks[1] and smallerRangeTasks[1] >= largerRangeTasks[0]:
-        result = 1
+def checkRangeInclusionRevised(TaskSet1,TaskSet2):
+    if int(TaskSet1[1])-int(TaskSet1[0])>0:
+        Tasks1Iterable = list(range(int(TaskSet1[0]),int(TaskSet1[1])+1))
     else:
-        result = 0 
+        Tasks1Iterable = list(range(int(TaskSet1[0]),int(TaskSet1[0])+1))
 
-    # if result == 1:
-    #     print(smallerRangeTasks,largerRangeTasks)
+    result = 0
+    print(Tasks1Iterable)
+    for i in range(len(Tasks1Iterable)):
+        if Tasks1Iterable[i]==int(TaskSet2[0]) or Tasks1Iterable[i]==int(TaskSet2[1]):
+            result = 1
+            break
+        elif Tasks1Iterable[i]>int(TaskSet2[0]) and Tasks1Iterable[i]<int(TaskSet2[1]):
+            result = 1
+            break
+        else:
+            continue
 
     return result
 
@@ -22,19 +27,9 @@ def isSomeOverlap(elfPairArray):
     elf2 = elfPairArray[1]
     elf2Tasks = elf2.split("-")
 
-    # Calculate range
-    elf1Range = int(elf1Tasks[1])-int(elf1Tasks[0])
-    elf2Range = int(elf2Tasks[1])-int(elf2Tasks[0])
-    
-    if elf1Range > elf2Range:
-        # Check if either elf number is within the two elf1Task numbers
-        res = checkRangeInclusion(elf1Tasks,elf2Tasks)
-    elif elf1Range < elf2Range:
-        # Check if either elf number is within the two elf1Task numbers
-        res = checkRangeInclusion(elf2Tasks,elf1Tasks)
-    else:
-        # Doesnt matter
-        res = checkRangeInclusion(elf1Tasks,elf2Tasks)
+    res = checkRangeInclusionRevised(elf1Tasks,elf2Tasks)
+    if res == 0:
+        res = checkRangeInclusionRevised(elf2Tasks,elf1Tasks)
 
     return res
 
@@ -44,10 +39,6 @@ if (__name__ == "__main__"):
     conditionMetCount = 0
     for elfPair in input_data:
         elfPairSplit = elfPair[0].split(",")
-        if isCompletelyOverlapping(elfPairSplit) == 1:
-            # conditionMetCount += 1
-            pin = 0
-        else:
-            conditionMetCount += isSomeOverlap(elfPairSplit)
+        conditionMetCount += isSomeOverlap(elfPairSplit)
 
     print(conditionMetCount)
