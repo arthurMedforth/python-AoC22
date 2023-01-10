@@ -1,4 +1,1 @@
-# python-AoC22
-
-
-Testing this repo
+My attempts at Advent of Code 2022 in Python!
