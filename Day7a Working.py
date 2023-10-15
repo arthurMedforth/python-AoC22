@@ -57,16 +57,21 @@ def main():
 
     return all_directories
 
-def sum_files(obj,dirs):
+def sum_files(obj, dirs):
+    if obj.name == 'lddhdslh':
+        print('look ohere')
     current_level_files_total = obj.sum_files()
+    lower_level_files_total = 0
     for name in obj.sub_dirs:
         for obj_iter in dirs:
             if obj_iter.name == name and obj_iter.parent == obj.name:
-                sub_obj = obj_iter
+                lower_level_files_total = sum_files(obj_iter, dirs)
+                current_level_files_total += lower_level_files_total
                 break
-        lower_level_files_total = sum_files(sub_obj,dirs)
-        current_level_files_total = current_level_files_total + lower_level_files_total
+
+    obj.total_size = current_level_files_total
     return current_level_files_total
+
 
 def get_answer_a(dirs):
     rolling_sum = 0 
@@ -80,21 +85,11 @@ def get_answer_a(dirs):
 
     return rolling_sum
 
-def total_for_single_dir(name, parent, all_directories):
-    for dir in all_directories:
-        if name == dir.name and parent == dir.parent:
-            return dir.total_size
-        else:
-            continue
-
 if __name__ == "__main__":
     all_directories = main()
-    get_answer_a(all_directories)
-    unused_space = 70000000-total_for_single_dir('/','',all_directories)
-    required_deletion_amount = abs(unused_space - 30000000)
-    options = []
-    for element in all_directories:
-        if total_for_single_dir(element.name,element.parent,all_directories) >= required_deletion_amount:
-            options.append(total_for_single_dir(element.name,element.parent,all_directories))
+    for obj in all_directories:
+        size = sum_files(obj, all_directories)
+        if obj.name == 'lddhdslh':
+            print('look ohere')
+        print('Directory '+ obj.name + ' is this big: ' + str(size))
 
-    print(min(options))
