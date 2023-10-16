@@ -5,17 +5,13 @@ input_lines = parseInput()
 class Directory:
     def __init__(self, name, parent):
         self.name = name
+        self.parent = parent
         self.file_sizes = []
         self.file_names = []
         self.sub_dirs = []
-        self.parent = parent
-        self.direct_size = 0
         self.total_size = 0
         self.ID = 0
         self.parent_ID = 0
-
-    def give_directory_name(self):
-        print('This is directory '  + self.name)
 
     def add_file(self, file_size, file_name):
         self.file_sizes.append(int(file_size))
@@ -27,8 +23,6 @@ class Directory:
     def calc_direct_size(self):
         return sum(self.file_sizes)
     
-    
-
 def main():
     pass_unfinished = True
     count = 0
@@ -69,9 +63,6 @@ def sum_files(obj, dirs):
     current_level_files_total = obj.calc_direct_size()
     lower_level_files_total = 0
     for name in obj.sub_dirs:
-        # if name == 'd':
-        #     print('happening')
-
         for obj_iter in dirs:
             if obj_iter.name == name and obj_iter.parent_ID == obj.ID:
                 lower_level_files_total = sum_files(obj_iter, dirs)
@@ -80,7 +71,6 @@ def sum_files(obj, dirs):
 
     obj.total_size = current_level_files_total    
     return current_level_files_total
-
 
 def get_answer_a(dirs):
     rolling_sum = 0 
@@ -94,35 +84,17 @@ def get_answer_a(dirs):
 
     return rolling_sum
 
-if __name__ == "__main__":
-    all_directories = main()
-    name_parent_combos = []
-    for obj in all_directories:
-        obj.total_size = sum_files(obj, all_directories)
-
+def get_answer_b(dirs):
     unused_space = 70000000 - all_directories[0].total_size
     diff_required = 30000000 - unused_space
-    
     options = []
     for obj in all_directories:
         if obj.total_size >= diff_required:
             options.append(obj.total_size)
     
-    print(min(options))
+    return min(options)
 
-    # sum_root = 0
-    # for line in input_lines:
-    #     if line[0] != '$' and line[0] != 'dir':
-    #         sum_root += int(line[0])
-
-
-    # print(sum_root)
-  
-  
-  
-   # for obj in all_directories:
-    #     size = sum_files(obj, all_directories)
-    #     if obj.name == 'lddhdslh':
-    #         print('look ohere')
-    #     print('Directory '+ obj.name + ' is this big: ' + str(size))
-
+if __name__ == "__main__":
+    all_directories = main()
+    answer_part_a = get_answer_a(all_directories)
+    answer_part_b = get_answer_b(all_directories)
