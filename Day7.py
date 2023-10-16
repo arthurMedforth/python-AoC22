@@ -1,61 +1,128 @@
 from parseInput import *
 
 input_lines = parseInput()
-# Develop recursive function that loops through contents of a file (after encountering ls _)
 
-# cd _ means you will set an active folder and add it to a dictionary
-# ls means loop through following entries (entering new recursion level if encoutering dir but adding to a contents count otherwise)
-# cd .. means you can return a total
+class Directory:
+    def __init__(self, name, parent):
+        self.name = name
+        self.file_sizes = []
+        self.file_names = []
+        self.sub_dirs = []
+        self.parent = parent
+        self.direct_size = 0
+        self.total_size = 0
+        self.ID = 0
+        self.parent_ID = 0
 
-def contentsRecursion(contents_dict, incoming_dir,incoming_line_num,sum_dir):
-    dir_found = False
-    for line_num, line in enumerate(input_lines):
- 
-        if line[0] == "$": # We know that this is a command
+    def give_directory_name(self):
+        print('This is directory '  + self.name)
 
-            if line[1:] == ['cd', '..']:
-                if dir_found:
-                    # we can return from this recursion level
-                    return int(contents_dict[current_key]), contents_dict, sum_dir
-                else: 
-                    continue
+    def add_file(self, file_size, file_name):
+        self.file_sizes.append(int(file_size))
+        self.file_names.append(file_name)
 
-            elif line[1:] == ['ls']:
-                # Following lines are contents for the current directory
-                continue
-            else:
- 
-                if line[2] == incoming_dir and line_num >= incoming_line_num:
-                    # Add to dictionary and set as active directory line[2]
-                    print("NEW DICT IS", line[2])
-                    current_key = len(contents_dict.keys())+1
-                    contents_dict[current_key] = 0
-                    current_dir = line[2]
-                    dir_found = True
+    def add_sub_dir(self, sub_dir_name):
+        self.sub_dirs.append(sub_dir_name)
+
+    def calc_direct_size(self):
+        return sum(self.file_sizes)
+    
+    
+
+def main():
+    pass_unfinished = True
+    count = 0
+    all_directories = []
+    dir_visit_ledger = []
+    while pass_unfinished:
+        current_line = input_lines[count]
+        if current_line[0] == '$': # This line is a command
+            if current_line[1] == 'cd' and current_line[2] != '..': # We are entering a new directory
+                if current_line[2] == '/': # Parent doesn't exist
+                    all_directories.append(Directory('/',''))
+                    all_directories[-1].ID += len(all_directories)
+                    dir_visit_ledger.append(all_directories[-1])
                 else:
-                    if dir_found:
-                        dir_found = False
-                    else:
-                        continue
-        else: # we know that this is a directory listing
-            if dir_found:
-                if line[0] == "dir": # it is a directory
-                    # Enter new recursion layer
-                    num, contents_dict, sum_dir = contentsRecursion(contents_dict, line[1],line_num, sum_dir)
-                    if num <= 100000:
-                        sum_dir += num
-                    contents_dict[current_key] += num
-                else: # It must be a file
-                    contents_dict[current_key] += int(line[0]) # Add to the total
+                    all_directories.append(Directory(current_line[2], dir_visit_ledger[-1].name))
+                    all_directories[-1].parent_ID = dir_visit_ledger[-1].ID
+                    all_directories[-1].ID += len(all_directories)
+                    dir_visit_ledger.append(all_directories[-1])
+            elif current_line[1] == 'cd' and current_line[2] == '..': # We are backing out
+                dir_visit_ledger.pop(-1) # We need to backout a level so update ledger
+            else: # We are listing the contents of the current directory @visited_dirs[-1]
+                print('About to list the contents of directory ' + all_directories[-1].name)
+        else: # This line is listing a directory or a file
+            if current_line[0] == 'dir':
+                all_directories[-1].add_sub_dir(current_line[1])
+            else:
+                all_directories[-1].add_file(current_line[0], current_line[1])
+
+        if count == len(input_lines) - 1:
+            pass_unfinished = False
+        else:
+            # Increment the counter
+            count += 1 
+
+    return all_directories
+
+def sum_files(obj, dirs):
+    current_level_files_total = obj.calc_direct_size()
+    lower_level_files_total = 0
+    for name in obj.sub_dirs:
+        # if name == 'd':
+        #     print('happening')
+
+        for obj_iter in dirs:
+            if obj_iter.name == name and obj_iter.parent_ID == obj.ID:
+                lower_level_files_total = sum_files(obj_iter, dirs)
+                current_level_files_total += lower_level_files_total
+                break
+
+    obj.total_size = current_level_files_total    
+    return current_level_files_total
 
 
-    return contents_dict[current_key], contents_dict, sum_dir
-                    
-contents_dict = {}
-num, contents_dict, sum_dir = contentsRecursion(contents_dict,"/",0,0)
+def get_answer_a(dirs):
+    rolling_sum = 0 
+    for obj in dirs:
+        current_sum = sum_files(obj,dirs) 
+        obj.total_size = current_sum
+        if current_sum <= 100000:
+            rolling_sum = rolling_sum + current_sum
+        else:
+            continue
 
-print("Answer is", sum_dir)
-print(contents_dict)
+    return rolling_sum
+
+if __name__ == "__main__":
+    all_directories = main()
+    name_parent_combos = []
+    for obj in all_directories:
+        obj.total_size = sum_files(obj, all_directories)
+
+    unused_space = 70000000 - all_directories[0].total_size
+    diff_required = 30000000 - unused_space
+    
+    options = []
+    for obj in all_directories:
+        if obj.total_size >= diff_required:
+            options.append(obj.total_size)
+    
+    print(min(options))
+
+    # sum_root = 0
+    # for line in input_lines:
+    #     if line[0] != '$' and line[0] != 'dir':
+    #         sum_root += int(line[0])
 
 
-# GREAT TIME TO START LEARNING ABOUT CLASSES
+    # print(sum_root)
+  
+  
+  
+   # for obj in all_directories:
+    #     size = sum_files(obj, all_directories)
+    #     if obj.name == 'lddhdslh':
+    #         print('look ohere')
+    #     print('Directory '+ obj.name + ' is this big: ' + str(size))
+
