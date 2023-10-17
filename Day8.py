@@ -109,7 +109,6 @@ def get_viewing_distance(dir_flag,vertic_index,horiz_index,row_const,col_const,g
                 return viewing_dist 
     else:
         raise(ValueError('This direction doesnt exist'))
-    
     return viewing_dist
 
 def find_best_scenic_score(grid):
@@ -124,7 +123,6 @@ def find_best_scenic_score(grid):
             current_viewing_dist = viewing_dist_left * viewing_dist_right * viewing_dist_up * viewing_dist_down
             if current_viewing_dist > highest_viewing_distance_score:
                 highest_viewing_distance_score = current_viewing_dist
-
     return highest_viewing_distance_score
 
 if __name__ == '__main__':
