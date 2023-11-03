@@ -31,3 +31,4 @@ if __name__ == "__main__":
             signal_strength_sum = checkForCriticalCycle(X, cycle_number, signal_strength_sum)
         count += 1
     print(signal_strength_sum)
+
