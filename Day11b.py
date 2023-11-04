@@ -97,8 +97,9 @@ if __name__ == "__main__":
         if count == 20:
             continue_bool = False
             break
+    
     inspected_list = []
     for monkey in monkeys:
         inspected_list.append(monkey.inspected_count)
-    inspected_list.sort()
-    print(inspected_list[-1]*inspected_list[-2])
+    
+    print(inspected_list)
