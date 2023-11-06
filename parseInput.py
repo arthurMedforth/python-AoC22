@@ -7,7 +7,7 @@ def parseInput():
 
     for i in range(len(file_lines)):
         line = file_lines[i].strip()
-        line_move = line.split(' ')
+        line_move = [*line]
         input_data_list.append(line_move)
 
 
