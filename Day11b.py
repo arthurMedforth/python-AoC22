@@ -1,4 +1,5 @@
 from parseInput import parseInput
+import numpy as np
 
 class Monkey:
     def __init__(self, id):
@@ -53,6 +54,7 @@ def itemTransaction(receiver_id, monkeys, item_value):
 if __name__ == "__main__":
     input_lines = parseInput()
     monkeys = []
+    testOpVals = []
     for element in input_lines:
         if element[0] != '': # new element
             if element[0] == 'Monkey':
@@ -64,6 +66,7 @@ if __name__ == "__main__":
                 monkeys[-1].processOperation(element)
             elif element[0].replace(':','')  == 'Test':
                 monkeys[-1].testOpVal = int(element[3])
+                testOpVals.append(int(element[3]))
             else: 
                 if element[1].replace(':','')  == 'true':
                     monkeys[-1].trueMonkeyID = int(element[5])
@@ -72,6 +75,7 @@ if __name__ == "__main__":
 
     # Process rounds
     count = 0
+    keyValue = np.prod(testOpVals)
     continue_bool = True
     while continue_bool:
         for monkey in monkeys:
@@ -84,7 +88,7 @@ if __name__ == "__main__":
                         continue
                     monkey.inspected_count += 1
                     new_value = executeOperation(item, monkey.worryLevelOp, monkey.worryLevelVal)
-                    new_value = new_value // 3
+                    new_value = new_value % keyValue
                     if new_value % monkey.testOpVal == 0:
                         # Throw item to True monkey trueMonkeyID
                         itemTransaction(monkey.trueMonkeyID, monkeys, new_value)
@@ -94,12 +98,13 @@ if __name__ == "__main__":
                         itemTransaction(monkey.falseMonkeyID, monkeys, new_value)
                         monkey.items[i] = -1
         count += 1
-        if count == 20:
+        if count == 10000:
             continue_bool = False
+            print('happened')
             break
     
     inspected_list = []
     for monkey in monkeys:
         inspected_list.append(monkey.inspected_count)
-    
-    print(inspected_list)
+    inspected_list.sort()
+    print(inspected_list[-1]*inspected_list[-2])
