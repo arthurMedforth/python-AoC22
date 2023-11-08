@@ -18,12 +18,10 @@ def getNewCoordHeight(curr_row, curr_col, maybe_new_row, maybe_new_col, grid):
         new_char = 'a'
     else:
         new_char = grid[maybe_new_row][maybe_new_col]
-
     if grid[curr_row][curr_col] == 'E':
         curr_char = 'z'
     else:
         curr_char = grid[curr_row][curr_col]
-    
     diff = alphabet.rfind(curr_char) - alphabet.rfind(new_char)
     if diff > 1:
         height = None
@@ -59,35 +57,41 @@ def nextBestStep(curr_row, curr_col, prev_dir, grid, move_stack):
         rankings.append([dir, [new_row, new_col], getNewCoordHeight(curr_row, curr_col, new_row, new_col, grid)])
     rankings = [element for element in rankings if element[2] != None]
     sorted_rankings = sorted(rankings, key = lambda y:y[2], reverse = True)
-    # If you get to the end of this and can't move anywhere
-    # You should add that coord to a list to backout from if you land there again
+    # MAYBE: If you get to the end of this and can't move anywhere
+    # MAYBE: You should add that coord to a list to backout from if you land there again
     for ranked_dir in sorted_rankings:
-        if [ranked_dir[1][0], ranked_dir[1][1]] in move_stack:
+        # Have we already been to this point
+        if [ranked_dir[1][0], ranked_dir[1][1]] in move_stack: # YES
+            # Try the next ranked direction
+            # MAYBE: Worth noting that things probably aren't going well if we are here!
             continue
         else:
-            move_stack.append([ranked_dir[1][0],ranked_dir[1][1]])
+            # NO so we cann add it to the current stack
+            move_stack.append([ranked_dir[1][0],ranked_dir[1][1]]) 
+            # Lets check that if its possible to beat the best so far if we theoretically took 
+            # the smallest journey physically possible to destination from where we are now
+            if len(success_steps_list) > 0:
+                theoretical_smallest_dist = abs(S_coords[0]-ranked_dir[1][0]) + abs(S_coords[1]-ranked_dir[1][1])
+                if theoretical_smallest_dist + (len(move_stack) - 1) >= min(success_steps_list):
+                    # There is no point carrying on with this traverse because 
+                    # we can't do better than best
+                    move_stack.pop(-1)
+                    break
 
+        # Is where we have just arrived our destination?
         if move_stack[-1] == S_coords:
             success_bool = True
             success_steps_list.append(len(move_stack)-1)
-            print(move_stack[-10:])
-            if move_stack.copy() not in move_stacks:
-                move_stacks.append(move_stack.copy())
-            else:
-                print(move_stack)
-            print('Found successful path: '+ str(len(move_stack)-1))
+            # print('Found successful path: '+ str(len(move_stack)-1))
             move_stack.pop(-1)
             break
         else:
-            if len(success_steps_list) > 0:
-                if len(move_stack)-1 > min(success_steps_list): # If we exceed the current best path count --> dont bother continuing
-                    #print('Give up here because you have exceeded the current lowest path step count')
-                    move_stack.pop(-1)
-                    break
-                else:
-                    success_bool, move_stack = nextBestStep(ranked_dir[1][0],ranked_dir[1][1], ranked_dir[0], grid, move_stack)
-            else:
-                success_bool, move_stack = nextBestStep(ranked_dir[1][0],ranked_dir[1][1], ranked_dir[0], grid, move_stack)
+            success_bool, move_stack = nextBestStep(ranked_dir[1][0],ranked_dir[1][1], ranked_dir[0], grid, move_stack)
+            # if success_bool:
+            #     move_stack.pop(-1)
+            #     break
+        # You need to check whether or not this is right
+        # Why aren't you checking the success_bool condition at all before 
         move_stack.pop(-1)
     return success_bool, move_stack
 
@@ -100,18 +104,17 @@ def findStart(grid,char):
                 continue
 
 if __name__ == "__main__":
+    # This code is starting at the end and trying to find the start
     input_lines = parseInput()
-    global duds
-    duds = []
     global success_steps_list 
     global E_coords
-    E_coords = list(findStart(input_lines,'E'))
     global S_coords
-    S_coords = list(findStart(input_lines,'S'))
     global move_stacks 
+    success_steps_list = []
     move_stacks = []
     move_stack = []
+    E_coords = list(findStart(input_lines,'E'))
+    S_coords = list(findStart(input_lines,'S'))
     move_stack.append(E_coords)
-    success_steps_list = []
     success_bool, move_stack = nextBestStep(E_coords[0], E_coords[1], 'None', input_lines, move_stack)
     print(min(success_steps_list))    
