@@ -1,16 +1,14 @@
 from parseInput import parseInput
 
 def getFeasibleDirs(curr_row, curr_col, row_lim, col_lim, prev_dir):
-    dir_list = ['left','right','up','down']
-    if curr_row == row_lim or prev_dir == 'up': # Dont go down
-        dir_list.pop(3) 
-    if curr_row == 0 or prev_dir == 'down': # Dont go up
-        dir_list.pop(2)
-    if curr_col == col_lim or prev_dir == 'left': # Dont go right
-        dir_list.pop(1)
-    if curr_col == 0 or prev_dir == 'right': # Dont go left
-        dir_list.pop(0) 
-    return dir_list
+    dir_conditions = {
+        'left': curr_col != 0 and prev_dir != 'right',
+        'right': curr_col != col_lim and prev_dir != 'left',
+        'up': curr_row != 0 and prev_dir != 'down',
+        'down': curr_row != row_lim and prev_dir != 'up'
+    }
+    return [dir for dir, condition in dir_conditions.items() if condition]
+
 
 def getNewCoordHeight(curr_row, curr_col, maybe_new_row, maybe_new_col, grid):
     alphabet = 'abcdefghijklmnopqrstuvwxyz'
