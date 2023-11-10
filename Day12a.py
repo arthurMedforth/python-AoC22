@@ -45,11 +45,18 @@ def getMaybeCoords(curr_row, curr_col, dir):
     return maybe_new_row, maybe_new_col
 
 def nextBestStep(curr_row, curr_col, prev_dir, grid, move_stack):
+    if [curr_row, curr_col] == E_coords:
+        move_stacks.append(move_stack.copy())
+        success_steps_list.append(len(move_stack)-1)
+        print(f"Found successful path with length = {len(move_stack)-1}")
+        success_bool = True
+        return success_bool, move_stack
+    else:
+        success_bool = False
     row_lim = len(grid) - 1
     col_lim = len(grid[0]) - 1
     dir_list = getFeasibleDirs(curr_row, curr_col, row_lim, col_lim, prev_dir)
     rankings = []
-    success_bool = False
     # For each of my feasible next directions - rank them in terms of priority
     # where 1 is the best score, then 0, then negative numbers (if you go down, you'll have to come back up...)
     for dir in dir_list:
@@ -62,33 +69,11 @@ def nextBestStep(curr_row, curr_col, prev_dir, grid, move_stack):
     for ranked_dir in sorted_rankings:
         # Have we already been to this point
         if [ranked_dir[1][0], ranked_dir[1][1]] in move_stack: # YES
-            # Try the next ranked direction
-            # MAYBE: Worth noting that things probably aren't going well if we are here!
             continue
         else:
-            # NO so we cann add it to the current stack
+            # NO so we can add it to the current stack
             move_stack.append([ranked_dir[1][0],ranked_dir[1][1]]) 
-            # Lets check that if its possible to beat the best so far if we theoretically took 
-            # the smallest journey physically possible to destination from where we are now
-            if len(success_steps_list) > 0:
-                theoretical_smallest_dist = abs(S_coords[0]-ranked_dir[1][0]) + abs(S_coords[1]-ranked_dir[1][1])
-                if theoretical_smallest_dist + (len(move_stack) - 1) >= min(success_steps_list):
-                    # There is no point carrying on with this traverse because 
-                    # we can't do better than best
-                    move_stack.pop(-1)
-                    break
-        # Is where we have just arrived our destination?
-        if move_stack[-1] == E_coords:
-            success_bool = True
-            success_steps_list.append(len(move_stack)-1)
-            print('Found successful path: '+ str(len(move_stack)-1))
-            move_stacks.append(move_stack.copy())
-            move_stack.pop(-1)
-            break
-        else:
-            success_bool, move_stack = nextBestStep(ranked_dir[1][0],ranked_dir[1][1], ranked_dir[0], grid, move_stack)
-        # You need to check whether or not this is right
-        # Why aren't you checking the success_bool condition at all before 
+        success_bool, move_stack = nextBestStep(ranked_dir[1][0],ranked_dir[1][1], ranked_dir[0], grid, move_stack)
         move_stack.pop(-1)
     return success_bool, move_stack
 
@@ -107,6 +92,8 @@ if __name__ == "__main__":
     global E_coords
     global S_coords
     global move_stacks 
+    global bad_moves
+    bad_moves = []
     success_steps_list = []
     move_stacks = []
     move_stack = []
