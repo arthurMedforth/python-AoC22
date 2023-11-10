@@ -4,6 +4,14 @@ def findChar(grid, char):
     coordinates = [[i, j] for i, row in enumerate(grid) for j, cell in enumerate(row) if cell == char]
     return coordinates[0] if coordinates else None
 
+def findMultiChar(grid, char):
+    coords = []
+    for i, row in enumerate(grid):
+        for j, cell in enumerate(row):
+            if cell == char:
+                coords.append([i,j])
+    return coords
+
 def getAdjNodes(curr_node_pos, grid):
     curr_row = curr_node_pos[0] 
     curr_col = curr_node_pos[1] 
@@ -40,12 +48,11 @@ def isViableNode(adj_node_row, adj_node_col, curr_node_row, curr_node_col, grid)
         viable_bool = True
     return viable_bool
 
-def BFS(grid):
+def BFS(grid, start_pos):
     queue = []
     visited = [[False for j in range(len(grid[0]))] for i in range(len(grid))]
-    curr_node_pos = findChar(grid, 'S')
-    queue.insert(0, curr_node_pos)
-    visited[curr_node_pos[0]][curr_node_pos[1]] = True
+    queue.insert(0, start_pos)
+    visited[start_pos[0]][start_pos[1]] = True
     found = False
     end_coords = findChar(grid, 'E')
     parent = {}
@@ -65,13 +72,30 @@ def BFS(grid):
 def reconstruct_path(start, end, parent):
     path = [end]
     while path[-1] != start:
-        path.append(parent[tuple(path[-1])])  # Convert to tuple before using as a key
+        try:
+            path.append(parent[tuple(path[-1])])  # Convert to tuple before using as a key
+        except:
+            return None
     path.reverse()
     return path
 
 if __name__ == "__main__":
     grid = parseInput()
-    parent = BFS(grid)
     start_coords = findChar(grid, 'S')
     end_coords = findChar(grid, 'E')
-    shortest_path = reconstruct_path(tuple(start_coords), tuple(end_coords), parent)
+    all_start_coords = findMultiChar(grid, 'a')
+    all_start_coords.append(start_coords)
+    potentials = []
+    # PART 1
+    # parent = BFS(grid, start_coords)
+    # shortest_path = reconstruct_path(tuple(start_coords), tuple(end_coords), parent)
+    # print(len(shortest_path)-1)
+    # PART 2
+    for coords in all_start_coords:
+        parent = BFS(grid, coords)
+        shortest_path = reconstruct_path(tuple(coords), tuple(end_coords), parent)
+        if shortest_path == None:
+            continue
+        else:
+            potentials.append(len(shortest_path)-1)
+    print(min(potentials))
