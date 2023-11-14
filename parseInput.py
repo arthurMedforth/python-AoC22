@@ -1,3 +1,5 @@
+import json
+
 def parseInput():
     # Read input
     fin=open('input.txt','rt') # File specified in command line or other
@@ -23,7 +25,27 @@ def parseInput5a():
     #     line_move = line.split(' ')[1]
     #     input_data_list.append(line_move)
 
+    return input_data_list
 
+def typeCastStringLists():
+    input_data_list = []
+    curr_pair = []
+    with open('input.txt','rt') as fin: # File specified in command line or others
+        file_lines = fin.readlines()
+        for i, line in enumerate(file_lines):
+            stripped_line = line.strip('\n')
+            if not stripped_line:
+                input_data_list.append(curr_pair)
+                curr_pair = []
+                continue
+            else:
+                try:
+                    actual_list = json.loads(line)
+                    curr_pair.append(actual_list)
+                    if i == len(file_lines)-1:
+                        input_data_list.append(curr_pair)
+                except json.JSONDecodeError as e:
+                    print(f"Error decoding JSON on line {i}: {e}")
     return input_data_list
 
 
