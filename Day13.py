@@ -44,7 +44,9 @@ def listCheck(left_list, right_list):
     else:
         lim = ['neither',len(left_list)]
 
-
+    if lim[1] == 0 and lim[0] == 'right':
+        return True, False
+    
     for i in range(lim[1]):
         # Need code here to check the data types
         incorrect_bool, parity_flag = processOperands(left_list[i], right_list[i])
@@ -81,6 +83,8 @@ if __name__ == "__main__":
         while not incorrect_bool:
             left = pair[0]
             right = pair[1]
+            if i == 6:
+                print('stop')
             incorrect_bool, parity_flag = processOperands(left, right)
             if incorrect_bool:
                 incorrect_order_inds.append(i+1)
@@ -93,4 +97,4 @@ if __name__ == "__main__":
             if incorrect_ind == ind:
                 inds.pop(ind-1)
 
-    print(inds)
+    print(sum(inds))
