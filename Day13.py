@@ -83,8 +83,6 @@ if __name__ == "__main__":
         while not incorrect_bool:
             left = pair[0]
             right = pair[1]
-            if i == 6:
-                print('stop')
             incorrect_bool, parity_flag = processOperands(left, right)
             if incorrect_bool:
                 incorrect_order_inds.append(i+1)
