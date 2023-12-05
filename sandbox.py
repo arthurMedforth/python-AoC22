@@ -1,10 +1,16 @@
-from elasticsearch_dsl import Q
+def split_range(original_range):
+    start, end = original_range
+    midpoint = (start + end) // 2
 
-dict_of_fields = ["filename","match.label"]
-must = []
-for item in dict_of_fields:    
-    must.append({'match': {'field_name': item}})
+    # Split the range into two smaller ranges
+    first_half = list((start, midpoint))
+    second_half = list((midpoint + 1, end))
 
-query = Q('bool', must=must)
+    return first_half, second_half
 
-print(type(query))
+# Example usage:
+original_range = [1000, 1000]
+smaller_ranges = split_range(original_range)
+
+print("Original Range:", original_range)
+print("Smaller Ranges:", list(smaller_ranges))

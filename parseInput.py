@@ -60,3 +60,16 @@ def parseInput3():
         games[subset_list[0]] = subset_list[1].split(';')
 
     return games
+
+def parseInput5():
+    # Read input
+    fin=open('input.txt','rt') # File specified in command line or other
+    file_lines=fin.readlines()
+    input_data_list = []
+    for i in range(len(file_lines)):
+        if file_lines[i] == '\n':
+            continue
+        line = file_lines[i].strip()
+        input_data_list.append(line)
+
+    return input_data_list
