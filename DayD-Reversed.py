@@ -26,10 +26,29 @@ def generate_values_from_pairs(pair_list):
     pair_list = [int(i) for i in pair_list] 
     return (value for start, size in zip(pair_list[0::2], pair_list[1::2]) for value in range(start, start + size))
 
+
+def getSource(_dict, ind, input_dest):
+    answer = None
+    keys = list(_dict.keys())
+    key_map = _dict[keys[ind]]
+    for val_set in key_map:
+        for i, dest in enumerate(val_set['dest_range']):
+            if input_dest == dest:
+                if keys[ind] == 'seed-to-soil map' and val_set['source_range'][i] in _dict['seeds']:
+                    return val_set['source_range'][i]
+                else:
+                    answer = getSource(_dict, ind - 1, val_set['source_range'][i])
+                    if answer:
+                        return answer
+            else:
+                continue
+    return answer
+
 if __name__ == "__main__":
     input_lines = parseInput5()
     complete_dict = processInput(input_lines)
     _dict = dict(zip(complete_dict.keys(),[[] for i in range(len(complete_dict.keys()))]))
+    _dict['seeds'] = [int(val) for val in complete_dict['seeds']]
     for key in complete_dict.keys():
         if key == 'seeds':
             continue
@@ -40,22 +59,11 @@ if __name__ == "__main__":
                 range_dict = processMap(el)
                 _dict[key].append(range_dict)
     locations = []
-
-    # This is where it gets really slow as this main loop alone is huge
-    for seed in generate_values_from_pairs(complete_dict['seeds']):
-        # print(f'Processing seed {seed}')
-        _key_of_interest = int(seed)
-        for key in _dict.keys(): # Loop through the map keys
-            if key == 'seeds':
-                continue
-            for range_dict in _dict[key]: # For each set of source and destination ranges
-                if _key_of_interest in range_dict["source_range"]: # Is the current seed/soil/water in the source range?
-                    #print(f'Seed no:{seed} maps to {key} {range_dict["dest_range"][range_dict["source_range"].index(_key_of_interest)]}')
-                    _key_of_interest = range_dict["dest_range"][range_dict["source_range"].index(_key_of_interest)]
-                    break           
-            #print(f'_key_of_interest remains the same: {_key_of_interest} for key map {key}')
-            if key == 'humidity-to-location map':
-                locations.append(_key_of_interest)
-    
-    print(min(locations))
-    
+    # Loop every location in the location map
+    for location_set in _dict['humidity-to-location map']:
+        for location in location_set['dest_range']:
+            if location == 82: 
+                print('stop')
+            answer = getSource(_dict, len(_dict.keys())-1, location)
+            if answer:
+                locations.append(location)
