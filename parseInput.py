@@ -73,3 +73,34 @@ def parseInput5():
         input_data_list.append(line)
 
     return input_data_list
+
+def parseInput6a():
+    # Read input
+    fin=open('input.txt','rt') # File specified in command line or other
+    file_lines=fin.readlines()
+    input_data_list = []
+    for i in range(len(file_lines)):
+        if file_lines[i] == '\n':
+            continue
+        line = file_lines[i].strip()
+        line_move = line.split(' ')
+        line_move = [int(el) for el in line_move if el not in  ['', 'Time:','Distance:']]
+        input_data_list.append(line_move)
+
+    return input_data_list
+
+def parseInput6b():
+    # Read input
+    fin=open('input.txt','rt') # File specified in command line or other
+    file_lines=fin.readlines()
+    input_data_list = []
+    for i in range(len(file_lines)):
+        if file_lines[i] == '\n':
+            continue
+        line = file_lines[i].strip()
+        line_move = line.split(' ')
+        line_move = [el for el in line_move if el not in  ['', 'Time:','Distance:']]
+        line_move = int(''.join(line_move))
+        input_data_list.append(line_move)
+
+    return input_data_list
