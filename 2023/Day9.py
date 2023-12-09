@@ -1,5 +1,11 @@
 from parseInput import parseInput
 
+def flipInputData(input_data):
+    new_input_data = []
+    for line in input_data:
+        new_input_data.append([el for el in reversed(line)])
+    return new_input_data
+
 def getDiffList(_list):
     diff_list = []
     all_zero = True
@@ -16,6 +22,8 @@ def getDiffList(_list):
 
 if __name__ == '__main__':
     input_data = parseInput()
+    # Part 2 - comment out for part 1
+    input_data = flipInputData(input_data)
     part1_sum = 0
     for line in input_data:
         master_diff_list = [line]
