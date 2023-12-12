@@ -2,7 +2,7 @@ import json
 
 def parseInput():
     # Read input
-    fin=open('input.txt','rt') # File specified in command line or other
+    fin=open('/Users/arthurmedforth/python-AoC22/2023/input.txt','rt') # File specified in command line or other
     file_lines=fin.readlines()
     input_data_list = []
     for i in range(len(file_lines)):
